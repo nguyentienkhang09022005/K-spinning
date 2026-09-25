@@ -34,7 +34,7 @@ const APP_PREFIXES = [
   "/login", "/__mimo_login/", "/i18n/", "/icons/", "/providers/",
 ];
 const APP_FILES = new Set([
-  "/favicon.svg", "/favicon.ico", "/file.svg", "/globe.svg", "/next.svg",
+  "/favicon.ico", "/logo.png", "/apple-touch-icon.png", "/file.svg", "/globe.svg", "/next.svg",
   "/vercel.svg", "/window.svg", "/sw.js", "/robots.txt", "/manifest.webmanifest",
 ]);
 

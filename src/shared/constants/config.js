@@ -3,7 +3,7 @@ import { APP_PORT } from "./ports.js";
 
 // App configuration
 export const APP_CONFIG = {
-  name: "9Router Proxy",
+  name: "K-spinning Proxy",
   description: "AI Infrastructure Management",
   version: pkg.version,
 };

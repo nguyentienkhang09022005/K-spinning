@@ -126,7 +126,9 @@ export default function LoginPage() {
       <div className="landing-grid absolute inset-0 pointer-events-none" aria-hidden="true" />
       <div className="relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">9Router</h1>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Logo" width={89} height={56} className="mx-auto mb-3 h-14 w-auto" />
+          <h1 className="text-3xl font-bold text-primary mb-2">K-spinning</h1>
           <p className="text-text-muted">
             Enter your password to access the dashboard
           </p>
