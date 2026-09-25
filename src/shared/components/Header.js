@@ -74,14 +74,14 @@ const getPageInfo = (pathname) => {
     return {
       title: "Providers",
       description: "Manage your AI provider connections",
-      icon: "dns",
+      icon: "smart_toy",
       breadcrumbs: [],
     };
   if (pathname.includes("/combos"))
     return {
       title: "Combos",
       description: "Model combos with fallback",
-      icon: "layers",
+      icon: "alt_route",
       breadcrumbs: [],
     };
   if (pathname.includes("/usage"))
@@ -89,28 +89,28 @@ const getPageInfo = (pathname) => {
       title: "Usage & Analytics",
       description:
         "Monitor your API usage, token consumption, and request logs",
-      icon: "bar_chart",
+      icon: "analytics",
       breadcrumbs: [],
     };
   if (pathname.includes("/auth-files"))
     return {
       title: "Auth Files",
       description: "Map provider credentials stored in the local database",
-      icon: "vpn_key",
+      icon: "key",
       breadcrumbs: [],
     };
   if (pathname.includes("/quota"))
     return {
       title: "Quota Tracker",
       description: "Track and manage your API quota limits",
-      icon: "data_usage",
+      icon: "speed",
       breadcrumbs: [],
     };
   if (pathname.includes("/token-saver"))
     return {
       title: "Token Saver",
       description: "Compress prompts and outputs to save tokens",
-      icon: "savings",
+      icon: "compress",
       breadcrumbs: [],
     };
   if (pathname.includes("/cli-tools"))
@@ -124,14 +124,14 @@ const getPageInfo = (pathname) => {
     return {
       title: "Proxy Pools",
       description: "Manage your proxy pool configurations",
-      icon: "lan",
+      icon: "router",
       breadcrumbs: [],
     };
   if (pathname.includes("/endpoint"))
     return {
       title: "Endpoint",
       description: "API endpoint configuration",
-      icon: "api",
+      icon: "key",
       breadcrumbs: [],
     };
   if (pathname.includes("/profile"))
@@ -152,14 +152,14 @@ const getPageInfo = (pathname) => {
     return {
       title: "Console Log",
       description: "Live server console output",
-      icon: "monitor",
+      icon: "receipt_long",
       breadcrumbs: [],
     };
   if (pathname === "/dashboard")
     return {
       title: "Endpoint",
       description: "API endpoint configuration",
-      icon: "api",
+      icon: "key",
       breadcrumbs: [],
     };
   return { title: "", description: "", breadcrumbs: [] };

@@ -9,29 +9,37 @@ import { cn } from "@/shared/utils/cn";
 import { APP_CONFIG } from "@/shared/constants/config";
 import { MEDIA_PROVIDER_KINDS } from "@/shared/constants/providers";
 
-// const VISIBLE_MEDIA_KINDS = ["embedding", "image", "imageToText", "tts", "stt", "webSearch", "webFetch", "video", "music"];
 const VISIBLE_MEDIA_KINDS = ["embedding", "image", "video", "tts", "stt", "systemone"];
-// Combined entry: webSearch + webFetch share one page at /dashboard/media-providers/web
 const COMBINED_WEB_ITEM = { id: "web", label: "Web Fetch & Search", icon: "travel_explore", href: "/dashboard/media-providers/web" };
 
+// Refined, intuitive iconography:
+// - key: Endpoint & API Key authentication
+// - smart_toy: AI Model Providers
+// - alt_route: Combo & Vision multi-route adapters
+// - analytics: Usage tracking & metrics
+// - speed: Quota limits & rate tracker
+// - compress: Token Saver compression
+// - terminal: CLI execution tools
 const navItems = [
-  { href: "/dashboard/endpoint", label: "Endpoint & Key", icon: "api" },
-  { href: "/dashboard/providers", label: "Providers", icon: "dns" },
-  // { href: "/dashboard/basic-chat", label: "Basic Chat", icon: "chat" }, // Hidden
-  { href: "/dashboard/combos", label: "Combo & Vision Adapter", icon: "layers" },
-  { href: "/dashboard/usage", label: "Usage", icon: "bar_chart" },
-  { href: "/dashboard/quota", label: "Quota Tracker", icon: "data_usage" },
-  { href: "/dashboard/token-saver", label: "Token Saver", icon: "savings" },
+  { href: "/dashboard/endpoint", label: "Endpoint & Key", icon: "key" },
+  { href: "/dashboard/providers", label: "Providers", icon: "smart_toy" },
+  { href: "/dashboard/combos", label: "Combo & Vision Adapter", icon: "alt_route" },
+  { href: "/dashboard/usage", label: "Usage Analytics", icon: "analytics" },
+  { href: "/dashboard/quota", label: "Quota Tracker", icon: "speed" },
+  { href: "/dashboard/token-saver", label: "Token Saver", icon: "compress" },
   { href: "/dashboard/cli-tools", label: "CLI Tools", icon: "terminal" },
 ];
 
-const debugItems = [
-  { href: "/dashboard/console-log", label: "Console Log", icon: "terminal" },
-  { href: "/dashboard/translator", label: "Translator", icon: "translate" },
+// - router: Proxy network pools
+const systemItems = [
+  { href: "/dashboard/proxy-pools", label: "Proxy Pools", icon: "router" },
 ];
 
-const systemItems = [
-  { href: "/dashboard/proxy-pools", label: "Proxy Pools", icon: "lan" },
+// - receipt_long: Log records (distinct from CLI terminal)
+// - translate: Translation format debugger
+const debugItems = [
+  { href: "/dashboard/console-log", label: "Console Log", icon: "receipt_long" },
+  { href: "/dashboard/translator", label: "Translator", icon: "translate" },
 ];
 
 export default function Sidebar({ onClose }) {
@@ -41,8 +49,10 @@ export default function Sidebar({ onClose }) {
 
   useEffect(() => {
     fetch("/api/settings")
-      .then(res => res.json())
-      .then(data => { if (data.enableTranslator) setEnableTranslator(true); })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.enableTranslator) setEnableTranslator(true);
+      })
       .catch(() => {});
   }, []);
 
@@ -53,169 +63,222 @@ export default function Sidebar({ onClose }) {
     return pathname.startsWith(href);
   };
 
-
   return (
-    <>
-      <aside className="flex w-72 flex-col border-r border-border-subtle bg-vibrancy backdrop-blur-xl transition-colors duration-300 min-h-full">
-        {/* Traffic lights */}
-        <div className="flex items-center gap-2 px-6 pt-5 pb-2">
-          <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-          <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-          <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
-        </div>
-
-        {/* Logo */}
-        <div className="px-6 py-4 flex flex-col gap-2">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <Image src="/logo.png" alt="Logo" width={57} height={36} priority className="h-9 w-auto shrink-0" />
-            <div className="flex flex-col">
-              <h1 className="text-lg font-semibold tracking-tight text-text-main">
+    <aside className="flex w-64 flex-col border-r border-border-subtle bg-sidebar transition-colors duration-200 min-h-full select-none">
+      {/* Brand Header */}
+      <div className="px-4 pt-4 pb-2.5">
+        <Link
+          href="/dashboard"
+          onClick={onClose}
+          className="flex items-center gap-3 px-2 py-1.5 rounded-lg transition-colors hover:bg-white/[0.04]"
+        >
+          <Image
+            src="/logo.png"
+            alt="K-spinning"
+            width={34}
+            height={34}
+            priority
+            className="h-7 w-auto shrink-0"
+          />
+          <div className="flex flex-col min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className="font-semibold text-sm text-slate-100 tracking-tight truncate">
                 {APP_CONFIG.name}
-              </h1>
-              <span className="text-xs text-text-muted">v{APP_CONFIG.version}</span>
+              </span>
             </div>
-          </Link>
-        </div>
+            <div className="flex items-center gap-1.5 text-[11px] text-slate-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+              <span className="font-mono">v{APP_CONFIG.version}</span>
+            </div>
+          </div>
+        </Link>
+      </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 px-4 py-2 space-y-0.5 overflow-y-auto custom-scrollbar">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={cn(
-                "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                isActive(item.href)
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-              )}
-            >
-              <span
-                className={cn(
-                  "material-symbols-outlined text-[18px]",
-                  isActive(item.href) ? "fill-1" : "group-hover:text-primary transition-colors"
-                )}
-              >
-                {item.icon}
-              </span>
-              <span className="text-[13px] font-medium">{item.label}</span>
-            </Link>
-          ))}
+      {/* Navigation Links */}
+      <nav className="flex-1 px-3 py-2 space-y-4 overflow-y-auto custom-scrollbar">
+        {/* Core Section */}
+        <div>
+          <div className="px-3 pb-1 text-[11px] font-medium tracking-wider text-slate-500 uppercase">
+            Services
+          </div>
 
-          {/* System section */}
-          <div className="pt-3 mt-2 space-y-0.5">
-            <p className="px-4 text-xs font-semibold text-text-muted/60 uppercase tracking-wider mb-2">
-              System
-            </p>
-
-            {/* Media Providers accordion */}
-            <button
-              onClick={() => setMediaOpen((v) => !v)}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                pathname.startsWith("/dashboard/media-providers")
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-              )}
-            >
-              <span className="material-symbols-outlined text-[18px]">perm_media</span>
-              <span className="text-[13px] font-medium flex-1 text-left">Media Providers</span>
-              {MEDIA_PROVIDER_KINDS.some((k) => VISIBLE_MEDIA_KINDS.includes(k.id) && k.isNew) && (
-                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-[3px] bg-green-500/15 text-green-400">NEW</span>
-              )}
-              <span className="material-symbols-outlined text-[14px] transition-transform" style={{ transform: mediaOpen ? "rotate(180deg)" : "rotate(0deg)" }}>
-                expand_more
-              </span>
-            </button>
-            {mediaOpen && (
-              <div className="pl-4">
-                {MEDIA_PROVIDER_KINDS.filter((k) => VISIBLE_MEDIA_KINDS.includes(k.id)).map((kind) => (
-                  <Link
-                    key={kind.id}
-                    href={`/dashboard/media-providers/${kind.id}`}
-                    onClick={onClose}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-1 rounded-lg transition-all group",
-                      pathname.startsWith(`/dashboard/media-providers/${kind.id}`)
-                        ? "bg-primary/10 text-primary"
-                        : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-                    )}
-                  >
-                    <span className="material-symbols-outlined text-[16px]">{kind.icon}</span>
-                    <span className="text-sm">{kind.label}</span>
-                    {kind.isNew && (
-                      <span className="ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-[3px] bg-green-500/15 text-green-400">NEW</span>
-                    )}
-                  </Link>
-                ))}
-                <Link
-                  key={COMBINED_WEB_ITEM.id}
-                  href={COMBINED_WEB_ITEM.href}
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-1 rounded-lg transition-all group",
-                    pathname.startsWith(COMBINED_WEB_ITEM.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-                  )}
-                >
-                  <span className="material-symbols-outlined text-[16px]">{COMBINED_WEB_ITEM.icon}</span>
-                  <span className="text-sm">{COMBINED_WEB_ITEM.label}</span>
-                </Link>
-              </div>
-            )}
-
-            {systemItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={onClose}
-                className={cn(
-                  "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                  isActive(item.href)
-                    ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-surface-2 hover:text-text-main"
-                )}
-              >
-                <span
-                  className={cn(
-                    "material-symbols-outlined text-[18px]",
-                    isActive(item.href) ? "fill-1" : "group-hover:text-primary transition-colors"
-                  )}
-                >
-                  {item.icon}
-                </span>
-                <span className="text-[13px] font-medium">{item.label}</span>
-              </Link>
-            ))}
-
-            {/* Debug items (inside System section, before Settings) */}
-            {debugItems.map((item) => {
-              const show = item.href !== "/dashboard/translator" || enableTranslator;
-              return show ? (
+          <div className="space-y-0.5">
+            {navItems.map((item) => {
+              const active = isActive(item.href);
+              return (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={onClose}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
-                    isActive(item.href)
-                      ? "bg-primary/10 text-primary"
-                      : "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                    "flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors group",
+                    active
+                      ? "bg-sky-500/10 text-sky-400"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
                   )}
                 >
                   <span
                     className={cn(
-                      "material-symbols-outlined text-[18px]",
-                      isActive(item.href) ? "fill-1" : "group-hover:text-primary transition-colors"
+                      "material-symbols-outlined text-[18px] transition-colors shrink-0",
+                      active
+                        ? "fill-1 text-sky-400"
+                        : "text-slate-400 group-hover:text-slate-200"
                     )}
                   >
                     {item.icon}
                   </span>
-                  <span className="text-[13px] font-medium">{item.label}</span>
+                  <span className="truncate">{item.label}</span>
                 </Link>
-              ) : null;
+              );
+            })}
+          </div>
+        </div>
+
+        {/* System Section */}
+        <div>
+          <div className="px-3 pb-1 text-[11px] font-medium tracking-wider text-slate-500 uppercase">
+            System
+          </div>
+
+          <div className="space-y-0.5">
+            {/* Media Providers Accordion */}
+            <button
+              onClick={() => setMediaOpen((v) => !v)}
+              className={cn(
+                "w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors group",
+                pathname.startsWith("/dashboard/media-providers")
+                  ? "bg-sky-500/10 text-sky-400"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+              )}
+            >
+              <span
+                className={cn(
+                  "material-symbols-outlined text-[18px] transition-colors shrink-0",
+                  pathname.startsWith("/dashboard/media-providers")
+                    ? "fill-1 text-sky-400"
+                    : "text-slate-400 group-hover:text-slate-200"
+                )}
+              >
+                perm_media
+              </span>
+              <span className="flex-1 text-left truncate">Media Providers</span>
+              {MEDIA_PROVIDER_KINDS.some((k) => VISIBLE_MEDIA_KINDS.includes(k.id) && k.isNew) && (
+                <span className="text-[10px] font-medium px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-400">
+                  NEW
+                </span>
+              )}
+              <span
+                className="material-symbols-outlined text-[15px] transition-transform duration-200 text-slate-400 shrink-0"
+                style={{ transform: mediaOpen ? "rotate(180deg)" : "rotate(0deg)" }}
+              >
+                expand_more
+              </span>
+            </button>
+
+            {/* Sub-items for Media */}
+            {mediaOpen && (
+              <div className="ml-3 pl-3 border-l border-white/[0.06] space-y-0.5 my-1">
+                {MEDIA_PROVIDER_KINDS.filter((k) => VISIBLE_MEDIA_KINDS.includes(k.id)).map((kind) => {
+                  const subActive = pathname.startsWith(`/dashboard/media-providers/${kind.id}`);
+                  return (
+                    <Link
+                      key={kind.id}
+                      href={`/dashboard/media-providers/${kind.id}`}
+                      onClick={onClose}
+                      className={cn(
+                        "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors",
+                        subActive
+                          ? "bg-sky-500/10 text-sky-400"
+                          : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                      )}
+                    >
+                      <span className="material-symbols-outlined text-[16px] shrink-0">{kind.icon}</span>
+                      <span className="truncate">{kind.label}</span>
+                      {kind.isNew && (
+                        <span className="ml-auto text-[9px] font-medium px-1 rounded bg-emerald-500/15 text-emerald-400">
+                          NEW
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+                <Link
+                  key={COMBINED_WEB_ITEM.id}
+                  href={COMBINED_WEB_ITEM.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors",
+                    pathname.startsWith(COMBINED_WEB_ITEM.href)
+                      ? "bg-sky-500/10 text-sky-400"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                  )}
+                >
+                  <span className="material-symbols-outlined text-[16px] shrink-0">{COMBINED_WEB_ITEM.icon}</span>
+                  <span className="truncate">{COMBINED_WEB_ITEM.label}</span>
+                </Link>
+              </div>
+            )}
+
+            {/* Proxy Pools */}
+            {systemItems.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors group",
+                    active
+                      ? "bg-sky-500/10 text-sky-400"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "material-symbols-outlined text-[18px] transition-colors shrink-0",
+                      active
+                        ? "fill-1 text-sky-400"
+                        : "text-slate-400 group-hover:text-slate-200"
+                    )}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              );
+            })}
+
+            {/* Debug items */}
+            {debugItems.map((item) => {
+              const show = item.href !== "/dashboard/translator" || enableTranslator;
+              if (!show) return null;
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onClose}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors group",
+                    active
+                      ? "bg-sky-500/10 text-sky-400"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "material-symbols-outlined text-[18px] transition-colors shrink-0",
+                      active
+                        ? "fill-1 text-sky-400"
+                        : "text-slate-400 group-hover:text-slate-200"
+                    )}
+                  >
+                    {item.icon}
+                  </span>
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              );
             })}
 
             {/* Settings */}
@@ -223,28 +286,37 @@ export default function Sidebar({ onClose }) {
               href="/dashboard/profile"
               onClick={onClose}
               className={cn(
-                "flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
+                "flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-colors group",
                 isActive("/dashboard/profile")
-                  ? "bg-primary/10 text-primary"
-                  : "text-text-muted hover:bg-surface-2 hover:text-text-main"
+                  ? "bg-sky-500/10 text-sky-400"
+                  : "text-slate-400 hover:text-slate-200 hover:bg-white/[0.04]"
               )}
             >
               <span
                 className={cn(
-                  "material-symbols-outlined text-[18px]",
-                  isActive("/dashboard/profile") ? "fill-1" : "group-hover:text-primary transition-colors"
+                  "material-symbols-outlined text-[18px] transition-colors shrink-0",
+                  isActive("/dashboard/profile")
+                    ? "fill-1 text-sky-400"
+                    : "text-slate-400 group-hover:text-slate-200"
                 )}
               >
                 settings
               </span>
-              <span className="text-[13px] font-medium">Settings</span>
+              <span className="truncate">Settings</span>
             </Link>
           </div>
-        </nav>
+        </div>
+      </nav>
 
-      </aside>
-
-    </>
+      {/* Understated Minimal Bottom Bar */}
+      <div className="px-4 py-3 border-t border-border-subtle flex items-center justify-between text-xs text-slate-400">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          <span className="font-mono text-[11px] text-slate-300">port 699</span>
+        </div>
+        <span className="text-[11px] text-slate-500">Localhost</span>
+      </div>
+    </aside>
   );
 }
 
