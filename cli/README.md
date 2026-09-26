@@ -1,125 +1,53 @@
-# 9Router - FREE AI Router & Token Saver
+# K-spinning
 
-**Never stop coding. Save 20-40% tokens with RTK + auto-fallback to FREE & cheap AI models.**
+Local AI gateway that **rotates your AI provider accounts** behind one OpenAI-compatible
+endpoint. It comes with a web dashboard for accounts, combos (model fallback), quota and
+usage tracking.
 
-**Connect All AI Code Tools (Claude Code, Cursor, Antigravity, Copilot, Codex, Gemini, OpenCode, Cline, OpenClaw...) to 40+ AI Providers & 100+ Models.**
+- One endpoint `http://localhost:26015/v1` for Claude Code, Codex, Cline, OpenCode, Cursor…
+- Multi-account rotation and fallback per provider; combos across providers
+- OAuth / API-key account management with automatic token refresh
+- Antigravity IDE routing through a local MITM (Dashboard → CLI Tools → MITM Tools)
 
-[![npm](https://img.shields.io/npm/v/9router.svg)](https://www.npmjs.com/package/9router)
-[![Downloads](https://img.shields.io/npm/dm/9router.svg)](https://www.npmjs.com/package/9router)
-[![Docker Pulls](https://img.shields.io/docker/pulls/decolua/9router.svg?logo=docker&label=Docker%20pulls)](https://hub.docker.com/r/decolua/9router)
-[![GHCR](https://img.shields.io/badge/GHCR-decolua%2F9router-blue?logo=github)](https://github.com/decolua/9router/pkgs/container/9router)
-[![License](https://img.shields.io/npm/l/9router.svg)](https://github.com/decolua/9router/blob/main/LICENSE)
+## Install
 
-<a href="https://trendshift.io/repositories/22628" target="_blank"><img src="https://trendshift.io/api/badge/repositories/22628" alt="decolua%2F9router | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
-
-[🌐 Website](https://9router.com) • [📖 Full Docs](https://github.com/decolua/9router)
-
----
-
-## 🤔 Why 9Router?
-
-**Stop wasting money, tokens and hitting limits:**
-
-- ❌ Subscription quota expires unused every month
-- ❌ Rate limits stop you mid-coding
-- ❌ Tool outputs (git diff, grep, ls...) burn tokens fast
-- ❌ Expensive APIs ($20-50/month per provider)
-
-**9Router solves this:**
-
-- ✅ **RTK Token Saver** - Auto-compress tool_result, save 20-40% tokens
-- ✅ **Maximize subscriptions** - Track quota, use every bit before reset
-- ✅ **Auto fallback** - Subscription → Cheap → Free, zero downtime
-- ✅ **Multi-account** - Round-robin between accounts per provider
-- ✅ **Universal** - Works with any OpenAI/Claude-compatible CLI
-
----
-
-## ⚡ Quick Start
-
-**Option 1 — npm (recommended for desktop):**
+Requires Node.js 18+ (22+ recommended).
 
 ```bash
-npm install -g 9router
-9router
-
-# Or run directly with npx
-npx 9router
+npm i -g k-spinning
+k-spinning
 ```
 
-**Option 2 — Docker (server/VPS):**
+Pick **Web UI** in the menu (or open `http://localhost:26015/dashboard`). The first login
+password is `123456`; change it right away in Profile.
 
-```bash
-docker run -d --name 9router -p 20128:20128 \
-  -v "$HOME/.9router:/app/data" -e DATA_DIR=/app/data \
-  decolua/9router:latest
-```
-
-Published images: [Docker Hub](https://hub.docker.com/r/decolua/9router) • [GHCR](https://github.com/decolua/9router/pkgs/container/9router) (multi-platform amd64/arm64).
-
-🎉 Dashboard opens at `http://localhost:20128`
-
-**2. Connect a FREE provider (no signup needed):**
-
-Dashboard → Providers → Connect **Kiro AI** (free Claude unlimited) or **OpenCode Free** (no auth) → Done!
-
-**3. Use in your CLI tool:**
+## Options
 
 ```
-Claude Code/Codex/OpenClaw/Cursor/Cline Settings:
-  Endpoint: http://localhost:20128/v1
-  API Key:  [copy from dashboard]
-  Model:    kr/claude-sonnet-4.5
+k-spinning [options]
+
+  -p, --port <port>   Port (default: 26015)
+  -H, --host <host>   Bind address (default: 0.0.0.0 — use 127.0.0.1 for local-only)
+  -n, --no-browser    Don't open the browser
+  -l, --log           Show server logs
+  -t, --tray          Run in the system tray (background)
+  --skip-update       Skip the update check
+  -v, --version       Show version
 ```
 
-That's it! Start coding with FREE AI models.
+Update: `npm i -g k-spinning@latest`
 
----
+## Data
 
-## 🚀 CLI Options
+Settings, accounts and usage are stored in:
 
-```bash
-9router                    # Start with default settings
-9router --port 8080        # Custom port
-9router --no-browser       # Don't open browser
-9router --skip-update      # Skip auto-update check
-9router --help             # Show all options
-```
+- Windows: `%APPDATA%\k-spinning`
+- macOS / Linux: `~/.k-spinning`
 
-**Dashboard**: `http://localhost:20128/dashboard`
+Set `DATA_DIR` to use another folder. K-spinning can run next to an upstream 9router install
+without sharing data, autostart entries or the MITM certificate.
 
----
+## License
 
-## 🛠️ Supported CLI Tools
-
-Claude-Code • OpenClaw • Codex • OpenCode • Cursor • Antigravity • Cline • Continue • Droid • Roo • Copilot • Kilo Code • Gemini CLI • Qwen Code • iFlow • Crush • Crusher • Aider
-
-Any tool supporting OpenAI/Claude-compatible API works.
-
----
-
-## 💾 Data Location
-
-- **macOS/Linux**: `~/.9router/db/data.sqlite`
-- **Windows**: `%APPDATA%/9router/db/data.sqlite`
-- **Docker**: `/app/data/db/data.sqlite` (mount `$HOME/.9router` to persist)
-
----
-
-## 📚 Documentation
-
-Full docs, advanced setup, video tutorials & development guide:
-
-- **GitHub**: https://github.com/decolua/9router
-- **Full README**: https://github.com/decolua/9router/blob/master/README.md
-- **Website**: https://9router.com
-
----
-
-## 🙏 Acknowledgments
-
-- **[CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI)** - Original Go implementation
-
-## 📄 License
-
-MIT License - see [LICENSE](LICENSE) for details.
+MIT. K-spinning is based on [9Router](https://github.com/decolua/9router) by decolua and
+contributors; see `LICENSE`.

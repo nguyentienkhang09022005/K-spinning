@@ -1,4 +1,3 @@
-import { Inter } from "next/font/google";
 import "material-symbols/outlined.css";
 import "./globals.css";
 import "@/lib/network/initOutboundProxy"; // Auto-initialize outbound proxy env
@@ -8,11 +7,6 @@ import { RuntimeI18nProvider } from "@/i18n/RuntimeI18nProvider";
 
 // Hook console immediately at module load time (server-side only, runs once)
 initConsoleLogCapture();
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
 
 export const metadata = {
   title: "K-spinning - AI Infrastructure Management",
@@ -39,7 +33,7 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <RuntimeI18nProvider>
           {children}
         </RuntimeI18nProvider>

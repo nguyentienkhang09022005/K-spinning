@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 /* source() sets scan base to src/ for both webpack + Turbopack; auto-detection still skips binaries + gitignore */
 @import "tailwindcss" source("../../");
 
@@ -85,21 +87,21 @@
   --color-primary: #38bdf8;
   --color-primary-hover: #0ea5e9;
 
-  /* Surfaces (dark - Clean neutral dark charcoal, no heavy blue tint) */
-  --color-bg: #0d1017;
-  --color-bg-alt: #12151d;
-  --color-surface: #161922;
-  --color-surface-2: #1e222c;
-  --color-surface-3: #272c38;
-  --color-sidebar: rgba(13, 16, 23, 0.92);
+  /* Surfaces (dark - Clean neutral dark charcoal with high-contrast surfaces) */
+  --color-bg: #0b0e14;
+  --color-bg-alt: #10141c;
+  --color-surface: #141822;
+  --color-surface-2: #1b212f;
+  --color-surface-3: #232a3b;
+  --color-sidebar: rgba(11, 14, 20, 0.94);
 
-  --color-border: #242936;
-  --color-border-subtle: #1a1e28;
+  --color-border: #232a3b;
+  --color-border-subtle: #19202e;
 
-  --color-text: #ededed;
-  --color-text-main: #ededed;
-  --color-text-muted: #949aa4;
-  --color-text-subtle: #6b7280;
+  --color-text: #f8fafc;
+  --color-text-main: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-text-subtle: #64748b;
 
   --color-danger: #f87171;
   --color-success: #34d399;
@@ -195,8 +197,9 @@ select {
   --shadow-elev: var(--shadow-elev);
   --shadow-focus: var(--shadow-focus);
 
-  /* Font - Inter primary, Apple system fallback */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', system-ui, sans-serif;
+  /* Modern sharp font stack - Plus Jakarta Sans with crisp geometric fallbacks */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'SF Pro Display', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* Base */
@@ -204,8 +207,14 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text-main);
   font-family: var(--font-sans);
+  letter-spacing: -0.012em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.022em;
 }
 
 /* Selection - brand-tinted */

@@ -40,32 +40,30 @@ function formatResetTimeDisplay(resetTime) {
 }
 
 /**
- * Get color classes based on remaining percentage
+ * Get clear, sharp, high-contrast status styling
  */
-function getColorClasses(remainingPercentage) {
-  if (remainingPercentage > 70) {
+function getQuotaStatus(remainingPercentage) {
+  if (remainingPercentage > 60) {
     return {
-      text: "text-green-600 dark:text-green-400",
-      bg: "bg-green-500",
-      bgLight: "bg-green-500/10",
-      emoji: "🟢",
+      dot: "bg-emerald-400",
+      bar: "bg-emerald-500",
+      percentText: "text-emerald-400",
     };
   }
 
-  if (remainingPercentage >= 30) {
+  if (remainingPercentage >= 20) {
     return {
-      text: "text-yellow-600 dark:text-yellow-400",
-      bg: "bg-yellow-500",
-      bgLight: "bg-yellow-500/10",
-      emoji: "🟡",
+      dot: "bg-amber-400",
+      bar: "bg-amber-400",
+      percentText: "text-amber-400",
     };
   }
 
+  // < 20%
   return {
-    text: "text-red-600 dark:text-red-400",
-    bg: "bg-red-500",
-    bgLight: "bg-red-500/10",
-    emoji: "🔴",
+    dot: "bg-rose-500",
+    bar: "bg-rose-500",
+    percentText: "text-rose-400",
   };
 }
 
@@ -82,7 +80,7 @@ function sortQuotas(quotas, sortMode) {
 }
 
 /**
- * Quota Table Component - Table-based display for quota data
+ * Quota Table Component - Sharp, high-contrast layout with full-width progress bars
  */
 export default function QuotaTable({
   quotas = [],
@@ -94,17 +92,18 @@ export default function QuotaTable({
   const [page, setPage] = useState(1);
 
   const normalizedQuotas = useMemo(
-    () => quotas.map((quota, index) => ({
-      ...quota,
-      index,
-      remaining: getRemainingPercentage(quota),
-    })),
-    [quotas],
+    () =>
+      quotas.map((quota, index) => ({
+        ...quota,
+        index,
+        remaining: getRemainingPercentage(quota),
+      })),
+    [quotas]
   );
 
   const sortedQuotas = useMemo(
     () => sortQuotas(normalizedQuotas, sortMode),
-    [normalizedQuotas, sortMode],
+    [normalizedQuotas, sortMode]
   );
 
   const totalPages = Math.max(1, Math.ceil(sortedQuotas.length / PAGE_SIZE));
@@ -121,138 +120,101 @@ export default function QuotaTable({
     return null;
   }
 
-  const currentPageRows = sortedQuotas.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE,
-  );
+  const currentPageRows = sortedQuotas.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
   const pageStart = sortedQuotas.length === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
   const pageEnd = Math.min(page * PAGE_SIZE, sortedQuotas.length);
 
-  const cellPad = compact ? "py-1 px-1.5" : "py-2 px-3";
-  const nameText = compact ? "text-[11px]" : "text-sm";
-  const resetPrimary = compact ? "text-[11px]" : "text-sm";
-  const resetSecondary = compact ? "text-[10px] leading-tight" : "text-xs";
-  const sortLabel = "Sorted by account remaining";
+  const sortLabel = "Sorted by remaining";
   const hasHideAction = typeof onHideQuota === "function";
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between gap-2">
-        <div className="text-[10px] text-text-muted">
-          {sortedQuotas.length} quota{sortedQuotas.length > 1 ? "s" : ""}
-        </div>
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-1 text-xs text-text-muted">
+        <span className="font-medium text-slate-300">
+          {sortedQuotas.length} {sortedQuotas.length > 1 ? "quotas" : "quota"}
+        </span>
         {showSortLabel && (
-          <div className="rounded-md border border-black/10 bg-black/[0.02] px-2 py-1 text-[10px] text-text-muted dark:border-white/10 dark:bg-white/[0.03]">
+          <span className="rounded px-2 py-0.5 text-[11px] text-slate-300 bg-surface-2 border border-border-subtle">
             {sortLabel}
-          </div>
+          </span>
         )}
       </div>
 
-      <div className="space-y-px">
+      {/* Quota Items List */}
+      <div className="space-y-1.5">
         {currentPageRows.map((quota) => {
           const isUnlimited = quota.unlimited === true;
           const isCreditBalance = quota.isCreditBalance === true;
-          const colors = isCreditBalance
-            ? { text: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500", bgLight: "bg-blue-500/10", emoji: "💰" }
-            : getColorClasses(quota.remaining);
+          const status = isCreditBalance
+            ? { dot: "bg-sky-400", bar: "bg-sky-500", percentText: "text-sky-400" }
+            : getQuotaStatus(quota.remaining);
           const countdown = formatResetTime(quota.resetAt);
           const resetDisplay = formatResetTimeDisplay(quota.resetAt);
-          // recurring defaults true: a missing flag means the quota
-          // refreshes at resetAt. Bonus/one-shot packs set recurring:false
-          // and their resetAt is a hard expiry, so word it as "expires".
           const recurring = quota.recurring !== false;
-          const countdownLabel = recurring ? `in ${countdown}` : `expires in ${countdown}`;
+          const countdownLabel = recurring ? `in ${countdown}` : `exp ${countdown}`;
 
           return (
             <div
               key={`${quota.name}-${quota.index}`}
-              className={`flex items-center gap-2 border-b border-black/5 dark:border-white/5 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors ${cellPad}`}
+              className="group flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-border-subtle bg-surface-2/30 hover:bg-surface-2/60 transition-all text-xs"
             >
-              {/* Name */}
-              <div className="flex w-36 min-w-0 items-center gap-1.5">
-                <span className="text-[10px] shrink-0">{colors.emoji}</span>
-                <span className={`${nameText} font-medium text-text-primary truncate`}>
+              {/* Left: Dot & Quota Name */}
+              <div className="flex items-center gap-1.5 shrink-0 w-28 sm:w-32 min-w-0">
+                <span className={`w-2 h-2 rounded-full shrink-0 ${status.dot}`} />
+                <span className="font-semibold text-xs text-slate-100 truncate" title={quota.name}>
                   {quota.name}
                 </span>
               </div>
 
-              {/* Progress + used/total */}
-              <div className={`min-w-0 flex-1 ${compact ? "space-y-1" : "space-y-1.5"}`}>
-                {!isUnlimited && !isCreditBalance && (
-                <div className={`${compact ? "h-1" : "h-1.5"} rounded-full overflow-hidden border ${colors.bgLight} ${
-                  quota.remaining === 0 ? "border-black/10 dark:border-white/10" : "border-transparent"
-                }`}>
+              {/* Middle: Long flexible progress bar */}
+              {!isUnlimited && !isCreditBalance ? (
+                <div className="flex-1 min-w-[90px] h-2 rounded-full bg-slate-800/80 border border-slate-700/60 overflow-hidden shrink">
                   <div
-                    className={`h-full transition-all duration-300 ${colors.bg}`}
+                    className={`h-full rounded-full transition-all duration-300 ${status.bar}`}
                     style={{ width: `${Math.min(quota.remaining, 100)}%` }}
                   />
                 </div>
-                )}
-
-                <div className={`flex items-center justify-between gap-1 min-w-0 ${compact ? "text-[10px]" : "text-xs"}`}>
-                  <span
-                    className="text-text-muted truncate"
-                    title={
-                      isUnlimited
-                        ? `${quota.used.toLocaleString()} used · Unlimited`
-                        : isCreditBalance
-                        ? `Credit balance: ${quota.total.toFixed(2)} ${quota.currency || ""}`
-                        : `${quota.used.toLocaleString()} / ${quota.total > 0 ? quota.total.toLocaleString() : "∞"}`
-                    }
-                  >
-                    {isUnlimited
-                      ? `${quota.used.toLocaleString()} used · Unlimited`
-                      : isCreditBalance
-                      ? `Credit: ${quota.total.toFixed(2)} ${quota.currency || ""}`
-                      : `${quota.used.toLocaleString()} / ${quota.total > 0 ? quota.total.toLocaleString() : "∞"}`}
-                  </span>
-                  <span className={`font-medium ${isUnlimited ? "text-green-600 dark:text-green-400" : isCreditBalance ? "text-blue-600 dark:text-blue-400" : colors.text} shrink-0`}>
-                    {isUnlimited ? "Unlimited" : isCreditBalance ? "" : `${quota.remaining}%`}
-                  </span>
+              ) : (
+                <div className="flex-1 min-w-[90px] text-[11px] text-slate-400 font-mono">
+                  {isUnlimited ? "Unlimited" : `Credit: ${quota.total.toFixed(2)} ${quota.currency || ""}`}
                 </div>
-              </div>
+              )}
 
-              {/* Reset time */}
-              <div className="min-w-0 shrink">
-                {countdown !== "-" || resetDisplay ? (
-                  compact ? (
-                    <div
-                      className={`${resetPrimary} text-text-primary font-medium truncate`}
-                      title={resetDisplay || ""}
-                    >
-                      {countdown !== "-" ? countdownLabel : resetDisplay}
-                    </div>
-                  ) : (
-                    <div className="min-w-0 space-y-0.5">
-                      {countdown !== "-" && (
-                        <div className={`${resetPrimary} text-text-primary font-medium truncate`}>
-                          {countdownLabel}
-                        </div>
-                      )}
-                      {resetDisplay && (
-                        <div className={`${resetSecondary} text-text-muted truncate`}>
-                          {resetDisplay}
-                        </div>
-                      )}
-                    </div>
-                  )
-                ) : (
-                  <div className={`${resetPrimary} text-text-muted italic`}>N/A</div>
-                )}
-              </div>
+              {/* Right: Usage count */}
+              {!isUnlimited && !isCreditBalance && (
+                <span className="font-mono text-[11px] text-slate-400 shrink-0 tabular-nums">
+                  <span className="text-slate-100 font-semibold">{quota.used.toLocaleString()}</span> / {quota.total > 0 ? quota.total.toLocaleString() : "∞"}
+                </span>
+              )}
 
-              {/* Hide action */}
+              {/* Right: Percentage */}
+              {!isUnlimited && !isCreditBalance && (
+                <span className={`font-mono text-xs font-bold shrink-0 w-9 text-right tabular-nums ${status.percentText}`}>
+                  {quota.remaining}%
+                </span>
+              )}
+
+              {/* Right: Countdown pill */}
+              {(countdown !== "-" || resetDisplay) && (
+                <span
+                  className="px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-300 bg-surface-3 border border-border-subtle shrink-0"
+                  title={resetDisplay || ""}
+                >
+                  {countdown !== "-" ? countdownLabel : resetDisplay}
+                </span>
+              )}
+
+              {/* Right: Hide action (hover) */}
               {hasHideAction && (
                 <button
                   type="button"
                   onClick={() => onHideQuota(quota)}
-                  className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-text-muted transition-colors hover:bg-black/5 hover:text-text-primary dark:hover:bg-white/5"
-                  title="Hide this quota row"
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 rounded text-slate-400 hover:text-slate-100 hover:bg-surface-3 shrink-0"
+                  title="Hide this quota"
                   aria-label={`Hide quota ${quota.name}`}
                 >
-                  <span className="material-symbols-outlined text-[15px]">
-                    visibility_off
-                  </span>
+                  <span className="material-symbols-outlined text-[14px]">visibility_off</span>
                 </button>
               )}
             </div>
@@ -260,30 +222,29 @@ export default function QuotaTable({
         })}
       </div>
 
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="rounded-md border border-black/10 bg-black/[0.02] px-2 py-1.5 dark:border-white/10 dark:bg-white/[0.03]">
-          <div className="flex items-center justify-between gap-2 text-[10px] text-text-muted">
-            <span>
-              Showing {pageStart}-{pageEnd} of {sortedQuotas.length}
-            </span>
-            <span>
-              Page {page} / {totalPages}
-            </span>
-          </div>
-          <div className="mt-1.5 flex items-center justify-end gap-1">
+        <div className="flex items-center justify-between px-1 pt-1 text-xs text-text-muted">
+          <span className="text-slate-400 font-mono">
+            {pageStart}-{pageEnd} of {sortedQuotas.length}
+          </span>
+          <div className="flex items-center gap-1.5">
             <button
               type="button"
-              onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex h-6 items-center rounded-md border border-black/10 px-2 text-[10px] text-text-primary transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:hover:bg-white/5"
+              className="px-2.5 py-1 rounded-md border border-border-subtle bg-surface-2 text-slate-200 hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-medium"
             >
               Prev
             </button>
+            <span className="px-1.5 font-mono text-slate-300 text-xs">
+              {page}/{totalPages}
+            </span>
             <button
               type="button"
-              onClick={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="flex h-6 items-center rounded-md border border-black/10 px-2 text-[10px] text-text-primary transition-colors hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/10 dark:hover:bg-white/5"
+              className="px-2.5 py-1 rounded-md border border-border-subtle bg-surface-2 text-slate-200 hover:bg-surface-3 disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-xs font-medium"
             >
               Next
             </button>
@@ -293,3 +254,5 @@ export default function QuotaTable({
     </div>
   );
 }
+
+QuotaTable.propTypes = {};

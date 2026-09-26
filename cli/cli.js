@@ -63,11 +63,12 @@ function createSpinner(text) {
 }
 
 const pkg = require("./package.json");
+const BRAND = require("./src/cli/brand");
 const { ensureSqliteRuntime, buildEnvWithRuntime } = require("./hooks/sqliteRuntime");
 const { ensureTrayRuntime } = require("./hooks/trayRuntime");
 const args = process.argv.slice(2);
 
-// Subcommands (`9router xai video …`) run against an already-running gateway
+// Subcommands (`k-spinning xai video …`) run against an already-running gateway
 // and bypass the launcher flow (no runtime self-heal, no server spawn).
 if (args[0] === "xai" && args[1] === "video") {
   const { run } = require("./src/cli/commands/xaiVideo");
@@ -80,7 +81,7 @@ if (args[0] === "xai" && args[1] === "video") {
   return;
 }
 
-// Self-heal SQLite runtime deps (sql.js + better-sqlite3) into ~/.9router/runtime
+// Self-heal SQLite runtime deps (sql.js + better-sqlite3) into ~/.k-spinning/runtime
 // so the server can resolve them via NODE_PATH. Best-effort — sql.js is required,
 // better-sqlite3 is optional. Logs to stderr only on failure.
 try { ensureSqliteRuntime({ silent: true }); } catch {}
@@ -92,7 +93,7 @@ try { ensureTrayRuntime({ silent: true }); } catch {}
 const APP_NAME = pkg.name; // Use from package.json
 const INSTALL_CMD_LATEST = `npm i -g ${APP_NAME}@latest --prefer-online`;
 
-const DEFAULT_PORT = 20128;
+const DEFAULT_PORT = BRAND.DEFAULT_PORT;
 const DEFAULT_HOST = "0.0.0.0";
 
 // First non-internal IPv4 — the address remote peers actually reach when bound to 0.0.0.0.
@@ -110,10 +111,14 @@ function getDisplayHost() {
   return host === DEFAULT_HOST ? "localhost" : host;
 }
 const MAX_PORT_ATTEMPTS = 10;
-// Identifiers for killAllAppProcesses - only kill 9router specifically
-const PROCESS_IDENTIFIERS = [
-  '9router'  // Only package name - avoid killing other apps
-];
+// killAllAppProcesses only targets node processes started from THIS install (cli.js, the
+// bundled app/ server, tray). Upstream matched any "9router" or "next-server" command line,
+// which also killed unrelated dev servers and a side-by-side 9router install.
+const INSTALL_DIR = __dirname.toLowerCase().replace(/[\\/]+/g, "/");
+function isOwnAppProcess(cmdLine) {
+  const cmd = String(cmdLine || "").toLowerCase().replace(/[\\/]+/g, "/");
+  return cmd.includes("node") && cmd.includes(INSTALL_DIR);
+}
 
 // Parse arguments
 let port = DEFAULT_PORT;
@@ -185,11 +190,9 @@ function compareVersions(a, b) {
   return 0;
 }
 
-// Get app data dir (matches app/src/lib/dataDir.js convention)
+// Get app data dir (matches app/src/lib/dataDir.js convention, honours DATA_DIR)
 function getAppDataDir() {
-  return process.platform === "win32"
-    ? path.join(process.env.APPDATA || "", "9router")
-    : path.join(os.homedir(), ".9router");
+  return BRAND.getDataDir();
 }
 
 // Kill PID from file (best-effort, removes file after)
@@ -246,7 +249,7 @@ function killCloudflaredByAppPort(appPort) {
   return pids;
 }
 
-// Kill all 9router processes
+// Kill all processes of this K-spinning install
 function killAllAppProcesses(appPort) {
   return new Promise((resolve) => {
     try {
@@ -273,13 +276,7 @@ function killAllAppProcesses(appPort) {
           });
           const lines = output.split("\n").slice(1).filter(l => l.trim());
           lines.forEach(line => {
-            // Whitelist: real node process running 9router/cli.js, or next-server.
-            // Avoids killing editors/grep/strace/cursor that just have "9router" in cmdline.
-            const cmd = line.toLowerCase();
-            const isAppProcess =
-              (cmd.includes("node") && cmd.includes("9router") && (cmd.includes("cli.js") || cmd.includes("\\9router") || cmd.includes("/9router")))
-              || cmd.includes("next-server");
-            if (isAppProcess) {
+            if (isOwnAppProcess(line)) {
               const match = line.match(/^"(\d+)"/);
               if (match && match[1] && match[1] !== process.pid.toString()) {
                 pids.push(match[1]);
@@ -299,13 +296,7 @@ function killAllAppProcesses(appPort) {
           const lines = output.split('\n');
 
           lines.forEach(line => {
-            // Whitelist: real node process running 9router/cli.js, or next-server.
-            // Avoids killing grep/strace/editors/cursor that incidentally match "9router".
-            const cmd = line.toLowerCase();
-            const isAppProcess =
-              (cmd.includes("node") && cmd.includes("9router") && (cmd.includes("cli.js") || cmd.includes("/9router")))
-              || cmd.includes("next-server");
-            if (isAppProcess) {
+            if (isOwnAppProcess(line)) {
               const parts = line.trim().split(/\s+/);
               const pid = parts[1];
               if (pid && !isNaN(pid) && pid !== process.pid.toString()) {
@@ -363,7 +354,7 @@ function waitForExit(pid, timeoutMs) {
 // Sends SIGTERM first so MIT can clean up host entries before dying.
 function killProxyByPidFile() {
   try {
-    const pidFile = path.join(getAppDataDir(), "mitm", ".mitm.pid");
+    const pidFile = path.join(getAppDataDir(), BRAND.MITM_DIR_NAME, ".mitm.pid");
     if (!fs.existsSync(pidFile)) return;
     const pid = parseInt(fs.readFileSync(pidFile, "utf8").trim(), 10);
     if (!pid) return;
@@ -774,7 +765,7 @@ function startServer(updatePromise) {
             process.on("SIGHUP", () => {});
 
             console.log(`\n⏳ Switching to tray mode... (icon already visible in menu bar)`);
-            console.log(`🔔 9Router is running in tray (PID: ${process.pid})`);
+            console.log(`🔔 ${BRAND.DISPLAY_NAME} is running in tray (PID: ${process.pid})`);
             console.log(`   Server: http://${displayHost}:${port}`);
             console.log(`\n💡 You can close this terminal. Right-click tray icon to quit.\n`);
 
@@ -793,7 +784,7 @@ function startServer(updatePromise) {
           });
           bgProcess.unref();
 
-          console.log(`🔔 9Router is now running in background (PID: ${bgProcess.pid})`);
+          console.log(`🔔 ${BRAND.DISPLAY_NAME} is now running in background (PID: ${bgProcess.pid})`);
           console.log(`   Server: http://${displayHost}:${port}`);
           console.log(`\n💡 You can close this terminal. Right-click tray icon to quit.\n`);
 
@@ -838,7 +829,7 @@ function startServer(updatePromise) {
     if (restartCount >= MAX_RESTARTS) {
       console.error(`\n⚠️  Server crashed ${MAX_RESTARTS} times. Disabling MIT and restarting...`);
       try {
-        const dbPath = path.join(os.homedir(), process.platform === "win32" ? path.join("AppData", "Roaming", "9router", "db.json") : path.join(".9router", "db.json"));
+        const dbPath = path.join(getAppDataDir(), "db.json");
         if (fs.existsSync(dbPath)) {
           const db = JSON.parse(fs.readFileSync(dbPath, "utf-8"));
           if (db.settings) db.settings.mitmEnabled = false;

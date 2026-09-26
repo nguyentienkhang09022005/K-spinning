@@ -113,6 +113,13 @@ const getPageInfo = (pathname) => {
       icon: "compress",
       breadcrumbs: [],
     };
+  if (pathname.includes("/mitm"))
+    return {
+      title: "MITM Proxy",
+      description: "Intercept Antigravity IDE traffic and route it through K-spinning",
+      icon: "security",
+      breadcrumbs: [],
+    };
   if (pathname.includes("/cli-tools"))
     return {
       title: "CLI Tools",

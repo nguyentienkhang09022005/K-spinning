@@ -1,3 +1,39 @@
+// MITM Tools — IDE tools intercepted via MITM proxy (K-spinning: Antigravity only)
+export const MITM_TOOLS = {
+  antigravity: {
+    id: "antigravity",
+    name: "Antigravity",
+    image: "/providers/antigravity.png",
+    color: "#4285F4",
+    description: "Route Antigravity IDE through K-spinning",
+    configType: "mitm",
+    mitmDomain: "daily-cloudcode-pa.googleapis.com",
+    modelAliases: ["gemini-3.8-flash-high", "gemini-3.8-flash-medium", "gemini-3.8-flash-low", "gemini-3.7-flash-high", "gemini-3.7-flash-medium", "gemini-3.7-flash-low", "gemini-3.6-flash-high", "gemini-3.6-flash-medium", "gemini-3.6-flash-low", "gemini-3.5-flash-low", "gemini-3-flash-agent", "gemini-3.5-flash-extra-low", "gemini-3.1-pro-low", "gemini-pro-agent", "claude-sonnet-4-6", "claude-opus-4-6-thinking", "gpt-oss-120b-medium", "gemini-3-flash"],
+    defaultModels: [
+      // "*" = every chat model without its own row (see CATCH_ALL_ALIAS in src/mitm/config.js).
+      { id: "*", name: "All other models (catch-all)", alias: "*" },
+      { id: "gemini-3.8-flash-high", name: "Gemini 3.8 Flash (High)", alias: "gemini-3.8-flash-high" },
+      { id: "gemini-3.8-flash-medium", name: "Gemini 3.8 Flash (Medium)", alias: "gemini-3.8-flash-medium" },
+      { id: "gemini-3.8-flash-low", name: "Gemini 3.8 Flash (Low)", alias: "gemini-3.8-flash-low" },
+      { id: "gemini-3.7-flash-high", name: "Gemini 3.7 Flash (High)", alias: "gemini-3.7-flash-high" },
+      { id: "gemini-3.7-flash-medium", name: "Gemini 3.7 Flash (Medium)", alias: "gemini-3.7-flash-medium" },
+      { id: "gemini-3.7-flash-low", name: "Gemini 3.7 Flash (Low)", alias: "gemini-3.7-flash-low" },
+      { id: "gemini-3.6-flash-high", name: "Gemini 3.6 Flash (High)", alias: "gemini-3.6-flash-high" },
+      { id: "gemini-3.6-flash-medium", name: "Gemini 3.6 Flash (Medium)", alias: "gemini-3.6-flash-medium" },
+      { id: "gemini-3.6-flash-low", name: "Gemini 3.6 Flash (Low)", alias: "gemini-3.6-flash-low" },
+      { id: "gemini-3.5-flash-low", name: "Gemini 3.5 Flash (Medium) / Default", alias: "gemini-3.5-flash-low", mandatory: true },
+      { id: "gemini-3-flash-agent", name: "Gemini 3.5 Flash (High)", alias: "gemini-3-flash-agent" },
+      { id: "gemini-3.5-flash-extra-low", name: "Gemini 3.5 Flash (Low)", alias: "gemini-3.5-flash-extra-low" },
+      { id: "gemini-3.1-pro-low", name: "Gemini 3.1 Pro (Low)", alias: "gemini-3.1-pro-low" },
+      { id: "gemini-pro-agent", name: "Gemini 3.1 Pro (High)", alias: "gemini-pro-agent" },
+      { id: "claude-sonnet-4-6", name: "Claude Sonnet 4.6 (Thinking)", alias: "claude-sonnet-4-6" },
+      { id: "claude-opus-4-6-thinking", name: "Claude Opus 4.6 (Thinking)", alias: "claude-opus-4-6-thinking" },
+      { id: "gpt-oss-120b-medium", name: "GPT-OSS 120B (Medium)", alias: "gpt-oss-120b-medium" },
+      { id: "gemini-3-flash", name: "Gemini 3 Flash (Command)", alias: "gemini-3-flash" },
+    ],
+  },
+};
+
 // CLI Tools configuration
 export const CLI_TOOLS = {
   claude: {

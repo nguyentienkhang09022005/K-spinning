@@ -821,9 +821,9 @@ export default function ProviderLimits() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Header Controls */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
+      <div className="flex flex-wrap items-center justify-end gap-1.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <div className="relative">
             <button
@@ -962,7 +962,11 @@ export default function ProviderLimits() {
             type="button"
             onClick={() => setExpiringFirst((prev) => !prev)}
             aria-pressed={expiringFirst}
-            className={`flex h-8 shrink-0 items-center gap-1 rounded-lg border px-2 text-xs transition-colors ${expiringFirst ? "border-amber-500/40 bg-amber-500/10 text-amber-500" : "border-black/10 text-text-primary hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"}`}
+            className={`flex h-8 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors ${
+              expiringFirst
+                ? "border-primary/40 bg-primary/10 text-primary"
+                : "border-border-subtle bg-surface-2 text-text-muted hover:text-text-main hover:bg-surface-3"
+            }`}
             title="Sort accounts by earliest quota reset time"
           >
             <span className="material-symbols-outlined text-[14px]">
@@ -976,10 +980,10 @@ export default function ProviderLimits() {
             type="button"
             onClick={handleDisableDepleted}
             disabled={bulkToggling}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-lg border border-red-500/30 px-2 text-xs text-red-500 transition-colors hover:bg-red-500/10 disabled:opacity-50"
+            className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-2 hover:bg-surface-3 px-2.5 text-xs font-medium text-text-muted hover:text-rose-400 transition-colors disabled:opacity-50"
             title="Disable connections with depleted quota on the current page"
           >
-            <span className="material-symbols-outlined text-[14px]">block</span>
+            <span className="material-symbols-outlined text-[14px] text-rose-500/70">block</span>
             <span className="hidden sm:inline">Turn off Empty</span>
           </button>
 
@@ -988,10 +992,10 @@ export default function ProviderLimits() {
             type="button"
             onClick={handleEnableAvailable}
             disabled={bulkToggling}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-lg border border-emerald-500/30 px-2 text-xs text-emerald-500 transition-colors hover:bg-emerald-500/10 disabled:opacity-50"
+            className="flex h-8 shrink-0 items-center gap-1.5 rounded-lg border border-border-subtle bg-surface-2 hover:bg-surface-3 px-2.5 text-xs font-medium text-text-muted hover:text-emerald-400 transition-colors disabled:opacity-50"
             title="Enable connections that still have quota on the current page"
           >
-            <span className="material-symbols-outlined text-[14px]">
+            <span className="material-symbols-outlined text-[14px] text-emerald-500/70">
               check_circle
             </span>
             <span className="hidden sm:inline">Turn on Available</span>
@@ -1000,17 +1004,21 @@ export default function ProviderLimits() {
           {/* Auto-refresh toggle */}
           <button
             onClick={() => setAutoRefresh((prev) => !prev)}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-lg border border-black/10 px-2 text-xs transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5"
+            className={`flex h-8 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-colors ${
+              autoRefresh
+                ? "border-primary/30 bg-primary/10 text-primary"
+                : "border-border-subtle bg-surface-2 text-text-muted hover:text-text-main hover:bg-surface-3"
+            }`}
             title={autoRefresh ? "Disable auto-refresh" : "Enable auto-refresh"}
           >
             <span
-              className={`material-symbols-outlined text-[14px] ${
+              className={`material-symbols-outlined text-[15px] ${
                 autoRefresh ? "text-primary" : "text-text-muted"
               }`}
             >
-              {autoRefresh ? "toggle_on" : "toggle_off"}
+              {autoRefresh ? "sync" : "sync_disabled"}
             </span>
-            <span className="hidden text-text-primary sm:inline">
+            <span className="hidden text-text-main sm:inline">
               Auto-refresh
             </span>
             {autoRefresh && (
@@ -1020,17 +1028,16 @@ export default function ProviderLimits() {
             )}
           </button>
 
-
           {/* Refresh all button */}
           <button
             type="button"
             onClick={() => refreshAll(true)}
             disabled={refreshingAll}
-            className="flex h-8 shrink-0 items-center gap-1 rounded-lg border border-black/10 px-2 text-xs text-text-primary transition-colors hover:bg-black/5 dark:border-white/10 dark:hover:bg-white/5 disabled:opacity-50"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border-subtle bg-surface-2 text-text-muted hover:text-text-main hover:bg-surface-3 transition-colors disabled:opacity-50"
             title="Refresh all"
           >
             <span
-              className={`material-symbols-outlined text-[14px] ${refreshingAll ? "animate-spin" : ""}`}
+              className={`material-symbols-outlined text-[15px] ${refreshingAll ? "animate-spin" : ""}`}
             >
               refresh
             </span>
@@ -1066,9 +1073,9 @@ export default function ProviderLimits() {
             <Card
               key={conn.id}
               padding="none"
-              className={`min-w-0 ${isInactive ? "opacity-60" : ""}`}
+              className={`min-w-0 border border-border-subtle bg-surface ${isInactive ? "opacity-60" : ""}`}
             >
-              <div className="px-3 py-2 border-b border-black/10 dark:border-white/10">
+              <div className="px-3 py-2 border-b border-border-subtle bg-surface">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0">
                     <div className="w-8 h-8 shrink-0 rounded-md flex items-center justify-center overflow-hidden">
@@ -1232,7 +1239,7 @@ export default function ProviderLimits() {
                         onClick={() => handleDeleteConnection(conn.id)}
                         disabled={rowBusy}
                         aria-label="Delete connection"
-                        className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-red-500/10 text-red-500 transition-colors disabled:opacity-50"
+                        className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-rose-500/10 text-text-muted hover:text-rose-400 transition-colors disabled:opacity-50"
                       >
                         <span
                           className={`material-symbols-outlined text-[18px] ${deletingId === conn.id ? "animate-pulse" : ""}`}
@@ -1323,7 +1330,7 @@ export default function ProviderLimits() {
         })}
       </div>
 
-      <div className="rounded-xl border border-black/10 bg-black/[0.02] px-3 py-2 dark:border-white/10 dark:bg-white/[0.03]">
+      <div className="rounded-lg border border-border-subtle bg-surface px-3 py-1.5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs text-text-muted">{connectionsPageSummary}</span>
             <div className="flex flex-wrap items-center gap-2">

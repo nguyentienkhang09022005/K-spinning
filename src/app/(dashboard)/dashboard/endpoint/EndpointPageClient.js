@@ -194,25 +194,35 @@ export default function APIPageClient({ machineId }) {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-5xl">
+    <div className="flex flex-col gap-3 w-full">
       {/* Top Status & Health Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 rounded-xl border border-border-subtle bg-surface">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 px-4 py-2 rounded-xl border border-border-subtle bg-surface w-full">
+        <div className="flex items-center flex-wrap gap-2.5">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
             <span className="text-xs font-semibold text-text-main">Gateway Active</span>
           </div>
-          <span className="text-border">•</span>
-          <span className="text-xs font-mono text-text-muted">Port 699</span>
-          <span className="text-border">•</span>
+          <span className="text-border-subtle">•</span>
+          <span className="px-2 py-0.5 rounded text-[11px] font-mono font-medium text-primary bg-primary/10 border border-primary/20">
+            Port 699
+          </span>
+          <span className="text-border-subtle">•</span>
           <span className="text-xs text-text-muted">OpenAI Compatible (v1)</span>
+          <span className="text-border-subtle hidden sm:inline">•</span>
+          <span className="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-400">
+            <span className="material-symbols-outlined text-[14px]">bolt</span>
+            SSE Streaming
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
           {pingStatus === "idle" && (
             <button
               onClick={handlePing}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-surface-2 hover:bg-surface-3 text-text-main transition-colors border border-border"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-surface-2 hover:bg-surface-3 text-text-main transition-colors border border-border-subtle"
               title="Test local proxy gateway latency"
             >
               <span className="material-symbols-outlined text-[15px] text-primary">speed</span>
@@ -220,216 +230,266 @@ export default function APIPageClient({ machineId }) {
             </button>
           )}
           {pingStatus === "testing" && (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-primary/10 text-primary border border-primary/20">
               <span className="material-symbols-outlined text-[15px] animate-spin">progress_activity</span>
-              <span>Pinging gateway...</span>
+              <span>Testing...</span>
             </span>
           )}
           {pingStatus === "success" && (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <span className="material-symbols-outlined text-[15px]">check_circle</span>
               <span>200 OK ({pingLatency}ms)</span>
             </span>
           )}
           {pingStatus === "error" && (
-            <span className="flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
+            <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">
               <span className="material-symbols-outlined text-[15px]">error</span>
-              <span>Gateway Unreachable</span>
+              <span>Gateway Offline</span>
             </span>
           )}
         </div>
       </div>
 
-      {/* API Endpoint Card */}
-      <Card>
-        <div className="mb-4">
-          <div className="flex items-center gap-2.5 mb-1">
-            <span className="material-symbols-outlined text-primary text-[20px]">hub</span>
-            <h2 className="text-base font-semibold text-text-main">API Endpoint</h2>
-          </div>
-          <p className="text-xs text-text-muted">
-            The base URL for all client requests. Use this endpoint in your OpenAI SDKs, CLI tools, and AI agents.
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2.5">
-          <EndpointRow
-            label="Local"
-            url={baseUrl}
-            copyId="local_url"
-            copied={copied}
-            onCopy={copy}
-          />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border-subtle text-[11px] text-text-muted">
-          <span className="font-medium text-text-muted">Supported:</span>
-          <span className="px-2 py-0.5 rounded bg-surface-2 text-text-muted font-mono">/v1/chat/completions</span>
-          <span className="px-2 py-0.5 rounded bg-surface-2 text-text-muted font-mono">/v1/models</span>
-          <span className="px-2 py-0.5 rounded bg-surface-2 text-text-muted font-mono">/v1/embeddings</span>
-          <span className="ml-auto text-primary">SSE Streaming supported</span>
-        </div>
-      </Card>
-
-      {/* API Keys Management Card */}
-      <Card id="require-api-key">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-          <div className="flex items-center gap-2.5">
-            <span className="material-symbols-outlined text-primary text-[20px]">key</span>
+      {/* Main 2-Column Balanced Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 w-full items-start">
+        {/* Left Column: API Endpoint Gateway (5 cols) */}
+        <div className="lg:col-span-5 flex flex-col h-full">
+          <Card className="flex flex-col justify-between h-full">
             <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-semibold text-text-main">API Keys</h2>
-                <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-surface-2 text-text-muted border border-border">
-                  {keys.length} {keys.length === 1 ? "key" : "keys"}
-                </span>
-              </div>
-              <p className="text-xs text-text-muted">
-                Authenticate client requests using Bearer authorization.
-              </p>
-            </div>
-          </div>
-          <Button icon="add" onClick={() => setShowAddModal(true)} size="sm">
-            Create Key
-          </Button>
-        </div>
-
-        {/* Security Setting: Require API Key */}
-        <div className="flex items-center justify-between p-3.5 mb-5 rounded-lg border border-border-subtle bg-surface-2/60">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-text-main">Require API Key Authentication</span>
-              {requireApiKey ? (
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                  Enforced
-                </span>
-              ) : (
-                <span className="px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                  Disabled
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-text-muted mt-0.5">
-              When enabled, incoming requests without a valid Bearer key will be rejected (401 Unauthorized).
-            </p>
-          </div>
-          <Toggle
-            checked={requireApiKey}
-            onChange={() => handleRequireApiKey(!requireApiKey)}
-          />
-        </div>
-
-        {isRemoteHost && !requireApiKey && (
-          <div className="mb-4">
-            <SecurityWarning message="Endpoint is exposed remotely without API key authentication. Enable 'Require API Key' above to secure your proxy." />
-          </div>
-        )}
-
-        {/* Keys List */}
-        {keys.length === 0 ? (
-          <div className="text-center py-10 rounded-lg border border-dashed border-border-subtle">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 text-primary mb-3">
-              <span className="material-symbols-outlined text-[24px]">key</span>
-            </div>
-            <p className="text-sm font-medium text-text-main mb-1">No API keys generated</p>
-            <p className="text-xs text-text-muted mb-4">Create an API key to securely authenticate your clients.</p>
-            <Button icon="add" onClick={() => setShowAddModal(true)} size="sm">
-              Create Key
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-2.5">
-            {keys.map((key) => {
-              const isVisible = visibleKeys.has(key.id);
-              const isKeyActive = key.isActive !== false;
-              return (
-                <div
-                  key={key.id}
-                  className={`group flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-lg border transition-colors ${
-                    isKeyActive
-                      ? "border-border-subtle bg-surface-2/40 hover:border-border"
-                      : "border-border-subtle bg-surface-2/15 opacity-60"
-                  }`}
-                >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <span className="text-sm font-semibold text-text-main truncate">{key.name}</span>
-                      {isKeyActive ? (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                          Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                          Paused
-                        </span>
-                      )}
-                      <span className="text-border text-xs">•</span>
-                      <span className="text-[11px] text-text-muted">
-                        Created {new Date(key.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-
-                    {/* Key token row */}
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs font-mono px-2 py-1 rounded bg-bg border border-border-subtle text-text-main select-all">
-                        {isVisible ? key.key : maskKey(key.key)}
-                      </code>
-                      <button
-                        onClick={() => toggleKeyVisibility(key.id)}
-                        className="p-1 hover:bg-surface-3 rounded text-text-muted hover:text-text-main transition-colors"
-                        title={isVisible ? "Hide full key" : "Show full key"}
-                      >
-                        <span className="material-symbols-outlined text-[16px]">
-                          {isVisible ? "visibility_off" : "visibility"}
-                        </span>
-                      </button>
-                      <button
-                        onClick={() => copy(key.key, key.id)}
-                        className="p-1 hover:bg-surface-3 rounded text-text-muted hover:text-primary transition-colors"
-                        title="Copy key"
-                      >
-                        <span className="material-symbols-outlined text-[16px]">
-                          {copied === key.id ? "check" : "content_copy"}
-                        </span>
-                      </button>
-                    </div>
+              {/* Header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                    <span className="material-symbols-outlined text-[17px]">hub</span>
                   </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-3 sm:self-center shrink-0">
-                    <Toggle
-                      size="sm"
-                      checked={isKeyActive}
-                      onChange={(checked) => {
-                        if (isKeyActive && !checked) {
-                          setConfirmState({
-                            title: "Pause API Key",
-                            message: `Pause API key "${key.name}"?\nRequests using this key will immediately be rejected until resumed.`,
-                            onConfirm: async () => {
-                              setConfirmState(null);
-                              handleToggleKey(key.id, checked);
-                            },
-                          });
-                        } else {
-                          handleToggleKey(key.id, checked);
-                        }
-                      }}
-                      title={isKeyActive ? "Pause key" : "Resume key"}
-                    />
-                    <button
-                      onClick={() => handleDeleteKey(key.id)}
-                      className="p-1.5 hover:bg-red-500/10 rounded text-text-muted hover:text-red-400 transition-colors"
-                      title="Delete key"
-                    >
-                      <span className="material-symbols-outlined text-[18px]">delete</span>
-                    </button>
+                  <div>
+                    <h2 className="text-sm font-semibold text-text-main leading-tight">API Endpoint</h2>
+                    <p className="text-[11px] text-text-muted">Base URL for OpenAI SDKs & CLI tools</p>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-        )}
-      </Card>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                  Ready
+                </span>
+              </div>
+
+              {/* Endpoint URL Input */}
+              <div className="mb-3">
+                <EndpointRow
+                  label="Local"
+                  url={baseUrl}
+                  copyId="local_url"
+                  copied={copied}
+                  onCopy={copy}
+                />
+              </div>
+
+              {/* Supported Routes */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-semibold text-text-muted uppercase tracking-wider">
+                  Supported Routes
+                </span>
+                <div className="space-y-1 text-xs">
+                  <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-surface-2/60 border border-border-subtle">
+                    <div className="flex items-center gap-2 font-mono text-[11px]">
+                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded">POST</span>
+                      <span className="text-slate-200">/v1/chat/completions</span>
+                    </div>
+                    <span className="text-[10px] text-text-muted">Chat & Reasoning</span>
+                  </div>
+                  <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-surface-2/60 border border-border-subtle">
+                    <div className="flex items-center gap-2 font-mono text-[11px]">
+                      <span className="text-[9px] font-bold text-sky-400 bg-sky-500/10 px-1 py-0.2 rounded">GET</span>
+                      <span className="text-slate-200">/v1/models</span>
+                    </div>
+                    <span className="text-[10px] text-text-muted">Model Catalog</span>
+                  </div>
+                  <div className="flex items-center justify-between px-2.5 py-1 rounded-lg bg-surface-2/60 border border-border-subtle">
+                    <div className="flex items-center gap-2 font-mono text-[11px]">
+                      <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-1 py-0.2 rounded">POST</span>
+                      <span className="text-slate-200">/v1/embeddings</span>
+                    </div>
+                    <span className="text-[10px] text-text-muted">Vector Embeddings</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer capability badge */}
+            <div className="mt-3 pt-2.5 border-t border-border-subtle flex items-center justify-between text-[11px] text-text-muted">
+              <span className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                Compatible with OpenAI SDK & Agents
+              </span>
+              <span className="text-primary text-[10px] font-medium">SSE Stream Enabled</span>
+            </div>
+          </Card>
+        </div>
+
+        {/* Right Column: API Keys Management (7 cols) */}
+        <div className="lg:col-span-7 flex flex-col h-full" id="require-api-key">
+          <Card className="flex flex-col justify-between h-full">
+            <div>
+              {/* Header */}
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                    <span className="material-symbols-outlined text-[17px]">key</span>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-sm font-semibold text-text-main leading-tight">API Keys</h2>
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono bg-surface-2 text-text-muted border border-border-subtle">
+                        {keys.length} {keys.length === 1 ? "key" : "keys"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-text-muted">Bearer token authentication for client apps</p>
+                  </div>
+                </div>
+                <Button icon="add" onClick={() => setShowAddModal(true)} size="sm">
+                  Create Key
+                </Button>
+              </div>
+
+              {/* Security Setting: Require API Key Authentication */}
+              <div className="flex items-center justify-between p-2 px-3 mb-2.5 rounded-lg border border-border-subtle bg-surface-2/40">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[17px] text-slate-400">shield</span>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-semibold text-text-main">Require API Key Authentication</span>
+                      {requireApiKey ? (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          Enforced
+                        </span>
+                      ) : (
+                        <span className="px-1.5 py-0.2 rounded text-[9px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                          Disabled
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-text-muted">
+                      {requireApiKey ? "Incoming requests without a Bearer key will be rejected (401)" : "Requests without a Bearer key are allowed"}
+                    </p>
+                  </div>
+                </div>
+                <Toggle
+                  size="sm"
+                  checked={requireApiKey}
+                  onChange={() => handleRequireApiKey(!requireApiKey)}
+                />
+              </div>
+
+              {isRemoteHost && !requireApiKey && (
+                <div className="mb-2.5">
+                  <SecurityWarning message="Endpoint is exposed remotely without API key authentication." />
+                </div>
+              )}
+
+              {/* Keys List */}
+              {keys.length === 0 ? (
+                <div className="text-center py-6 rounded-lg border border-dashed border-border-subtle">
+                  <div className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 text-primary mb-1.5">
+                    <span className="material-symbols-outlined text-[18px]">key</span>
+                  </div>
+                  <p className="text-xs font-medium text-text-main mb-0.5">No API keys generated</p>
+                  <p className="text-[11px] text-text-muted mb-2.5">Create an API key to securely authenticate clients.</p>
+                  <Button icon="add" onClick={() => setShowAddModal(true)} size="sm">
+                    Create Key
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-1.5 max-h-[220px] overflow-y-auto pr-0.5 custom-scrollbar">
+                  {keys.map((key) => {
+                    const isVisible = visibleKeys.has(key.id);
+                    const isKeyActive = key.isActive !== false;
+                    return (
+                      <div
+                        key={key.id}
+                        className={`group flex items-center justify-between gap-2 p-1.5 px-2.5 rounded-lg border transition-colors ${
+                          isKeyActive
+                            ? "border-border-subtle bg-surface-2/30 hover:border-border hover:bg-surface-2/60"
+                            : "border-border-subtle bg-surface-2/10 opacity-60"
+                        }`}
+                      >
+                        {/* Left: Name, Status, Masked Key */}
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <span className="text-xs font-semibold text-slate-100 truncate shrink-0 max-w-[110px]" title={key.name}>
+                            {key.name}
+                          </span>
+                          {isKeyActive ? (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shrink-0">
+                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                              Active
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded text-[9px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20 shrink-0">
+                              Paused
+                            </span>
+                          )}
+
+                          {/* Token box */}
+                          <code className="text-[11px] font-mono px-2 py-0.5 rounded bg-bg border border-border-subtle text-slate-200 select-all shrink-0">
+                            {isVisible ? key.key : maskKey(key.key)}
+                          </code>
+
+                          <button
+                            onClick={() => toggleKeyVisibility(key.id)}
+                            className="p-0.5 hover:bg-surface-3 rounded text-text-muted hover:text-text-main transition-colors shrink-0"
+                            title={isVisible ? "Hide full key" : "Show full key"}
+                          >
+                            <span className="material-symbols-outlined text-[14px]">
+                              {isVisible ? "visibility_off" : "visibility"}
+                            </span>
+                          </button>
+                          <button
+                            onClick={() => copy(key.key, key.id)}
+                            className="p-0.5 hover:bg-surface-3 rounded text-text-muted hover:text-primary transition-colors shrink-0"
+                            title="Copy key"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">
+                              {copied === key.id ? "check" : "content_copy"}
+                            </span>
+                          </button>
+                        </div>
+
+                        {/* Right: Actions */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Toggle
+                            size="sm"
+                            checked={isKeyActive}
+                            onChange={(checked) => {
+                              if (isKeyActive && !checked) {
+                                setConfirmState({
+                                  title: "Pause API Key",
+                                  message: `Pause API key "${key.name}"?\nRequests using this key will immediately be rejected until resumed.`,
+                                  onConfirm: async () => {
+                                    setConfirmState(null);
+                                    handleToggleKey(key.id, checked);
+                                  },
+                                });
+                              } else {
+                                handleToggleKey(key.id, checked);
+                              }
+                            }}
+                            title={isKeyActive ? "Pause key" : "Resume key"}
+                          />
+                          <button
+                            onClick={() => handleDeleteKey(key.id)}
+                            className="p-1 hover:bg-rose-500/10 rounded text-text-muted hover:text-rose-400 transition-colors"
+                            title="Delete key"
+                          >
+                            <span className="material-symbols-outlined text-[15px]">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </Card>
+        </div>
+      </div>
 
       {/* Add Key Modal */}
       <Modal

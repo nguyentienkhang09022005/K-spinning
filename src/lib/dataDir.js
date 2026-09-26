@@ -2,7 +2,8 @@ import fs from "node:fs";
 import path from "path";
 import os from "os";
 
-const APP_NAME = "9router";
+// Keep in sync with src/mitm/paths.js and cli/src/cli/brand.js (DATA_DIR_NAME).
+const APP_NAME = "k-spinning";
 
 function defaultDir() {
   if (process.platform === "win32") {
