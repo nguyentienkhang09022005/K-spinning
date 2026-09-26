@@ -8,7 +8,7 @@ K-spinning (`k-spinning`, a slimmed fork of 9Router v0.5.86) — a local AI rout
 
 Two published artifacts live in this one repo:
 - The **dashboard + gateway** (root `package.json`, `k-spinning`) — the Next.js server that does the actual routing.
-- The **CLI launcher** (`cli/`, published to npm as `9router`) — a separate package that installs/starts the server and manages the tray. It has its own `package.json`, version, and build.
+- The **CLI launcher** (`cli/`, published to npm as `k-spinning`, command `k-spinning`) — a separate package that installs/starts the server and manages the tray. It has its own `package.json`, version, and build. Its identity (name, default port, data dir) lives in `cli/src/cli/brand.js`, mirrored by value from the app; `tests/unit/cli-brand.test.js` fails if they drift.
 
 The code lives in `src/` (Next.js app + dashboard/compat APIs), `open-sse/` (the provider-agnostic routing/translation engine), `cli/` (the launcher package), and `tests/`.
 
@@ -76,8 +76,7 @@ Two authoritative docs already exist — read them before working in these areas
 ### Persistence — IMPORTANT (ARCHITECTURE.md is stale here)
 State is **no longer `db.json`**. It's a SQLite layer under `src/lib/db/` with an adapter fallback chain (`driver.js`): `bun:sqlite` → `better-sqlite3` (optional native dep) → `node:sqlite` (Node ≥22.5) → `sql.js` (pure-JS fallback, always works). `better-sqlite3` is deliberately in `optionalDependencies` so install never fails without build tools.
 - `src/lib/localDb.js` is a **backward-compat shim** re-exporting `src/lib/db/index.js`. New code should import from `@/lib/db/index.js`; per-entity logic lives in `src/lib/db/repos/*`. Schema/migrations in `src/lib/db/migrations/`.
-- DB file location resolves via `src/lib/db/paths.js` (`DATA_DIR`, else `~/.9router/`).
-- Usage/logs (`src/lib/usageDb.js`, `usage.json` + `log.txt`) still live under `~/.9router` and do **not** follow `DATA_DIR`.
+- DB file location resolves via `src/lib/db/paths.js` → `src/lib/dataDir.js` (`DATA_DIR`, else `%APPDATA%\k-spinning` / `~/.k-spinning`). Usage, logs and request details are in the same SQLite DB (`src/lib/usageDb.js` is a shim), so everything follows `DATA_DIR`. The name is intentionally different from upstream's `9router` so both can be installed side by side; `src/mitm/paths.js` and `cli/src/cli/brand.js` must use the same name.
 
 ### RTK token saver (`open-sse/rtk/`)
 Pre-translate hooks that compress `tool_result` content in-place to cut tokens. **Fail-open**: any error returns null and leaves the body untouched — never throw out of them. Skips `is_error`/`status:"error"` results to preserve traces.

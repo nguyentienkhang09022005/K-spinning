@@ -6,6 +6,8 @@ Versions follow [Semantic Versioning](https://semver.org/).
 ## Unreleased
 
 ### Added
+- npm package `k-spinning` (`cli/`): `npm i -g k-spinning`, then run `k-spinning`. Default port
+  26015.
 - Antigravity IDE MITM is back (Dashboard → CLI Tools → MITM Tools), restored from 9router
   v0.5.86 and limited to Antigravity. Its chat traffic now rotates through K-spinning's
   accounts and combos instead of the account logged in to the IDE.
@@ -25,6 +27,19 @@ Versions follow [Semantic Versioning](https://semver.org/).
   K-spinning wrote itself.
 - DNS toggle errors are shown in the UI instead of being swallowed, and mappings can be
   edited before DNS is enabled.
+
+### Changed (CLI / data)
+- Default data directory is now `%APPDATA%\k-spinning` (Windows) or `~/.k-spinning`
+  (macOS/Linux), instead of upstream's `9router` folder. `DATA_DIR` still overrides it.
+  Existing installs that relied on the old default must set `DATA_DIR` or move the folder.
+- The launcher only kills processes started from its own install directory. Upstream killed
+  every `next-server` and every node process with `9router` in its command line, which
+  also took down dev servers and a side-by-side 9router.
+- Autostart entries (`k-spinning.vbs`, `com.k-spinning.autostart`, `k-spinning.desktop`) and
+  the runtime folder are separate from upstream 9router's.
+- The CLI build no longer ships `*.nft.json` trace manifests, the build-time HOME
+  (`.build-home`, which holds Next telemetry IDs) or a baked-in build-machine path for the
+  MITM server. Telemetry is disabled during the build.
 
 ### Security (MITM)
 - The MITM listens on `127.0.0.1` only. Upstream listened on every interface while injecting
