@@ -11,7 +11,8 @@
     "hooks",
     "app",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "NOTICE"
   ],
   "scripts": {
     "dev": "nodemon -I --watch cli.js --watch src --watch hooks --ext js,json cli.js",

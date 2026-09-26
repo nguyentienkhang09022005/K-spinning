@@ -49,5 +49,5 @@ without sharing data, autostart entries or the MITM certificate.
 
 ## License
 
-MIT. K-spinning is based on [9Router](https://github.com/decolua/9router) by decolua and
-contributors; see `LICENSE`.
+MIT © 2026 TienKhang. K-spinning is based on [9Router](https://github.com/decolua/9router)
+by decolua and contributors, whose MIT notice is kept in `NOTICE`.
