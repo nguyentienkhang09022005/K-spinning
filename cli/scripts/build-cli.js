@@ -23,6 +23,7 @@ const EXCLUDE_PATTERNS = [
   "*.log",          // Log files
   "tmp",            // Temp files
   ".DS_Store",      // macOS files
+  ".build-home",    // Isolated HOME used during the build — holds Next telemetry IDs
 ];
 
 function shouldExclude(name) {
@@ -182,6 +183,7 @@ function buildCliPackage() {
         LOCALAPPDATA: path.join(buildHomeDir, "AppData", "Local"),
         NEXT_DIST_DIR: buildDistDirName,
         NEXT_TRACING_ROOT_MODE: "workspace",
+        NEXT_TELEMETRY_DISABLED: "1",
       }
     });
     console.log("✅ Next.js build completed\n");
@@ -298,6 +300,19 @@ function buildCliPackage() {
   mergeServerArtifacts(buildDistDir, cliAppDir);
   assertRequiredApiArtifacts(cliAppDir);
   console.log("✅ Copied complete server artifacts\n");
+
+  // Step 6c: Drop output-tracing manifests. They are only read at build time and list
+  // absolute paths of the build machine (user profile, repo location) — never publish them.
+  console.log("6️⃣ c Removing trace manifests (*.nft.json)...");
+  let nftRemoved = 0;
+  (function removeNft(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) removeNft(full);
+      else if (entry.name.endsWith(".nft.json")) { fs.rmSync(full, { force: true }); nftRemoved++; }
+    }
+  })(cliAppDir);
+  console.log(`✅ Removed ${nftRemoved} trace manifests\n`);
 
   // Step 7: Copy MITM server files (not bundled by Next.js standalone)
   console.log("7️⃣  Copying MITM server files...");

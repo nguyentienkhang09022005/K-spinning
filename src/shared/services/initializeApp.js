@@ -1,23 +1,12 @@
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-import { existsSync } from "fs";
 import { cleanupProviderConnections, getSettings, updateSettings, getApiKeys } from "@/lib/localDb";
 import { killAllBridges } from "@/lib/mcp/stdioSseBridge";
 import { getMitmStatus, startMitm, loadEncryptedPassword, initDbHooks, restoreToolDNS, removeOwnedDNSEntriesSync } from "@/mitm/manager";
 import { syncToJson as syncMitmAliasCache } from "@/lib/mitmAliasCache";
 
-// Inject correct paths and DB hooks into manager.js (CJS) from ESM context
-(function bootstrapMitm() {
-  if (!process.env.MITM_SERVER_PATH) {
-    try {
-      const thisFile = fileURLToPath(import.meta.url);
-      const appSrc = dirname(dirname(thisFile));
-      const candidate = join(appSrc, "mitm", "server.js");
-      if (existsSync(candidate)) process.env.MITM_SERVER_PATH = candidate;
-    } catch { /* ignore */ }
-  }
-  try { initDbHooks(getSettings, updateSettings); } catch { /* ignore */ }
-})();
+// Inject DB hooks into manager.js (CJS) from ESM context. server.js is located by
+// manager's resolveBundledServerPath() from cwd (repo root in dev, app/ in the CLI):
+// import.meta.url would be baked in as the BUILD machine's path by webpack.
+try { initDbHooks(getSettings, updateSettings); } catch { /* ignore */ }
 
 process.setMaxListeners(20);
 
